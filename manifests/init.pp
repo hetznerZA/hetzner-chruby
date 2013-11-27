@@ -19,7 +19,7 @@ class chruby(
     default => $download_root
   }
 
-  file { [ $ruby_prefix, $sources_dest ]:
+  file { [ $ruby_prefix, $staging_root, $sources_dest ]:
     ensure => 'directory',
     owner  =>  $user,
     group  =>  $group,
