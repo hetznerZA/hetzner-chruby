@@ -22,7 +22,7 @@ class chruby(
   file { [ $ruby_prefix, $sources_dest ]:
     ensure => 'directory',
     owner  =>  $user,
-    guid   =>  $group,
+    group  =>  $group,
   }
 
   if $staging {
