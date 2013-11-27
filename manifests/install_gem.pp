@@ -12,7 +12,7 @@ define chruby::install_gem(
     $version_string = ''
   }
 
-  exec { "install ${gem}":
+  exec { "install ${gem} on ${ruby_version}":
     command => "/usr/local/bin/chruby-exec ${ruby_version} -- gem install ${gem} ${version_string} --no-ri --no-rdoc",
     unless  => "/usr/local/bin/chruby-exec ${ruby_version} -- gem list | grep '^${gem}' ${version_check}",
   }
