@@ -5,11 +5,21 @@ class chruby(
   $staging_root  = '/opt/puppet_staging',
   $user          = 'puppet',
   $group         =  $user,
-  $sources_root  = "${staging_root}/sources",
-  $download_root = "${staging_root}/downloads",
+  $sources_root  =  undef,
+  $download_root =  undef
 ) {
 
-  file { [ $ruby_prefix, $sources_root, $download_root ]:
+  $sources_dest = $sources_root ? {
+    undef   => "${staging_root}/sources",
+    default => $sources_root
+  }
+
+  $download_dest = $download_root ? {
+    undef   => "${download_root}/downloads",
+    default => $download_root
+  }
+
+  file { [ $ruby_prefix, $sources_dest ]:
     ensure => 'directory',
     owner  =>  $user,
     guid   =>  $group,
@@ -17,7 +27,7 @@ class chruby(
 
   if $staging {
     class { 'staging':
-      path  => $download_root,
+      path  => $download_dest,
       owner => $user,
       group => $group,
     }
@@ -25,17 +35,17 @@ class chruby(
 
   # Pull down and install a tool to manage our versions of Ruby
   staging::deploy { "chruby-${version}.tar.gz":
-    target  => $sources_root,
+    target  => $sources_dest,
     source  => 'https://github.com/postmodern/chruby/archive/v${version}.tar.gz',
     user    => $user,
     group   => $group,
-    creates => "${sources_root}/chruby-${version}",
+    creates => "${sources_dest}/chruby-${version}",
     require => Class['staging'],
     before  => Exec['install chruby'],
   }
 
   exec { 'install chruby':
-    cwd     => "${sources_root}/chruby-${version}",
+    cwd     => "${sources_dest}/chruby-${version}",
     command => 'make install',
     creates => '/usr/local/share/chruby',
     path    => [ '/sbin', '/usr/sbin', '/bin', '/usr/bin' ],
