@@ -34,12 +34,20 @@ class chruby(
   }
 
   # Pull down and install a tool to manage our versions of Ruby
+  staging::file { "chruby-${version}.tar.gz":
+    source  => "https://github.com/postmodern/chruby/archive/v${version}.tar.gz",
+  }
+
+  staging::extract { "chruby-${version}.tar.gz":
+    target  => $sources_dest
+    creates => "${sources_dest}/chruby-${version}",
+    require => Staging::File["chruby-${version}.tar.gz"],
+  }
+
   staging::deploy { "chruby-${version}.tar.gz":
     target  => $sources_dest,
-    source  => "https://github.com/postmodern/chruby/archive/v${version}.tar.gz",
     user    => $user,
     group   => $group,
-    creates => "${sources_dest}/chruby-${version}",
     require => Class['staging'],
     before  => Exec['install chruby'],
   }
