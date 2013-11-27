@@ -44,13 +44,13 @@ class chruby(
     require => Staging::File["chruby-${version}.tar.gz"],
   }
 
-  staging::deploy { "chruby-${version}.tar.gz":
-    target  => $sources_dest,
-    user    => $user,
-    group   => $group,
-    require => Class['staging'],
-    before  => Exec['install chruby'],
-  }
+  #staging::deploy { "chruby-${version}.tar.gz":
+  #  target  => $sources_dest,
+  #  user    => $user,
+  #  group   => $group,
+  #  require => Class['staging'],
+  #  before  => Exec['install chruby'],
+  #}
 
   exec { 'install chruby':
     cwd     => "${sources_dest}/chruby-${version}",
