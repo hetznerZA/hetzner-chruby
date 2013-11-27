@@ -1,7 +1,7 @@
 class chruby(
   $version       = 'v0.3.7',
   $ruby_prefix   = '/opt/rubies',
-  $stage         =  true,
+  $staging       =  true,
   $staging_root  = '/opt/puppet_staging',
   $user          = 'puppet',
   $group         =  $user,
@@ -11,7 +11,7 @@ class chruby(
 
   file { $ruby_prefix: ensure => 'directory' }
 
-  if $stage {
+  if $staging {
     class { 'staging':
       path  => $download_root,
       owner => $user,
