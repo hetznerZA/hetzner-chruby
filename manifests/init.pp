@@ -39,7 +39,7 @@ class chruby(
   }
 
   staging::extract { "chruby-${version}.tar.gz":
-    target  => $sources_dest
+    target  => $sources_dest,
     creates => "${sources_dest}/chruby-${version}",
     require => Staging::File["chruby-${version}.tar.gz"],
   }
