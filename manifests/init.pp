@@ -9,7 +9,11 @@ class chruby(
   $download_root = "${staging_root}/downloads",
 ) {
 
-  file { $ruby_prefix: ensure => 'directory' }
+  file { [ $ruby_prefix, $sources_root, $download_root ]:
+    ensure => 'directory',
+    owner  =>  $user,
+    guid   =>  $group,
+  }
 
   if $staging {
     class { 'staging':
