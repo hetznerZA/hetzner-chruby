@@ -15,7 +15,7 @@ class chruby(
   }
 
   $download_dest = $download_root ? {
-    undef   => "${download_root}/downloads",
+    undef   => "${staging_root}/downloads",
     default => $download_root
   }
 
