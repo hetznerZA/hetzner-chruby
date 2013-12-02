@@ -1,5 +1,5 @@
 class chruby(
-  $version       = 'v0.3.7',
+  $version       = '0.3.7',
   $ruby_prefix   = '/opt/rubies',
   $staging       =  true,
   $staging_root  = '/opt/puppet_staging',
@@ -34,9 +34,9 @@ class chruby(
   }
 
   # Pull down and install a tool to manage our versions of Ruby
-  staging::deploy { "chruby-${version}.tar.gz":
+  staging::deploy { "chruby-v${version}.tar.gz":
     target  => $sources_dest,
-    source  => "https://github.com/postmodern/chruby/archive/${version}.tar.gz",
+    source  => "https://github.com/postmodern/chruby/archive/v${version}.tar.gz",
     user    => $user,
     group   => $group,
     creates => "${sources_dest}/chruby-${version}",
