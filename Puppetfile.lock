@@ -1,0 +1,8 @@
+FORGE
+  remote: https://forge.puppetlabs.com
+  specs:
+    nanliu/staging (0.3.1)
+
+DEPENDENCIES
+  nanliu/staging (>= 0)
+
