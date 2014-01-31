@@ -1,9 +1,11 @@
 .DS_Store
-**/*.swp
+*.swp
 .bundle
 .librarian
 .tmp
+.vagrant
 results_spec.xml
 modules
+pkg
 wiki
 
