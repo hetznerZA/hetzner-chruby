@@ -55,7 +55,7 @@ class chruby(
   # is necessary for `chruby-exec` to work
   file { '/etc/profile.d/chruby.sh':
     ensure  => 'file',
-    content => ". '/usr/local/share/chruby/chruby.sh'",
+    content => '. "/usr/local/share/chruby/chruby.sh"',
     require => Exec['install chruby'],
   }
 }
