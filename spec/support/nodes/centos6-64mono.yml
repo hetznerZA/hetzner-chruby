@@ -1,0 +1,10 @@
+HOSTS:
+  master:
+    roles:
+      - "agent"
+      - "master"
+    hypervisor: "vagrant"
+    box: "centos6"
+    box_url: "http://puppet-vagrant-boxes.puppetlabs.com/centos-65-i386-virtualbox-puppet.box"
+    platform: "el-6-i386"
+    distmoduledir: "/etc/puppet/modules"
