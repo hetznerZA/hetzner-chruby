@@ -38,11 +38,8 @@ module Beaker
         defaults   = Beaker::Options::Presets.presets
         env_opts   = Beaker::Options::Presets.env_vars
         @node_file = hunt_for_file(rspec_config.node_set, rspec_config)
-        puts File.basename(@node_file)
         this_run_dir = File.join('.vagrant', 'beaker_vagrant_files', File.basename(@node_file))
-        puts this_run_dir
         provisioned = File.exists?(this_run_dir)
-        puts provisioned
         provision = provisioned ? rspec_config.provision : true
         node_opts  = Beaker::Options::HostsFileParser.parse_hosts_file(node_file)
         user_opts  = rspec_config.beaker.merge({
