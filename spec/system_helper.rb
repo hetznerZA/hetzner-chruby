@@ -2,6 +2,20 @@ require 'beaker'
 
 module Beaker
   module RSpec
+    module Bridge
+      def hosts
+        @hosts ||= Beaker::RSpec::TestState.instance.hosts.dup
+      end
+
+      def options
+        @options ||= Beaker::RSpec::TestState.instance.options.dup
+      end
+
+      def logger
+        @logger ||= options[:logger]
+      end
+    end
+
     # This manages our test state / beaker run stages in an RSpec aware way
     class TestState
       require 'pathname'
@@ -40,14 +54,14 @@ module Beaker
         @node_file = hunt_for_file(rspec_config.node_set, rspec_config)
         this_run_dir = File.join('.vagrant', 'beaker_vagrant_files', File.basename(@node_file))
         provisioned = File.exists?(this_run_dir)
-        provision = provisioned ? rspec_config.provision : true
+        rspec_config.provision = provisioned ? rspec_config.provision : true
         node_opts  = Beaker::Options::HostsFileParser.parse_hosts_file(node_file)
         user_opts  = rspec_config.beaker.merge({
                        :color      => rspec_config.color,
                        :log_level  => 'debug',
                        :quiet      => false,
                        :hosts_file => File.basename(node_file),
-                       :provision  => provision
+                       :provision  => rspec_config.provision
         })
 
         @options  = defaults.
@@ -161,19 +175,6 @@ end
 # within your tests
 ::RSpec.configure do |c|
   c.include Beaker::DSL
-
-  c.before :each do
-    self.class.send(:define_method, :hosts) do
-      @hosts ||= Beaker::RSpec::TestState.instance.hosts.dup
-    end
-
-    self.class.send(:define_method, :options) do
-      @options ||= Beaker::RSpec::TestState.instance.options.dup
-    end
-
-    self.class.send(:define_method, :logger) do
-      @logger ||= options[:logger]
-    end
-  end
+  c.include Beaker::RSpec::Bridge
 end
 
