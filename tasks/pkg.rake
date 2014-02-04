@@ -48,6 +48,11 @@ namespace :pkg do
 
     m = Blacksmith::Modulefile.new
     forge = Blacksmith::Forge.new
+
+    forge.url      = ENV['PKG_FORGE']    if ENV['PKG_FORGE']
+    forge.username = ENV['PKG_USERNAME'] if ENV['PKG_FORGE']
+    forge.password = ENV['PKG_PASSWORD'] if ENV['PKG_FORGE']
+
     puts "Uploading to Puppet Forge #{forge.username}/#{m.name}"
     forge.push!(m.name)
   end
