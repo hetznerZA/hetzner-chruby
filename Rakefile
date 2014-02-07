@@ -19,6 +19,7 @@ namespace :ci do
     desc 'Run beaker-rspec formatted for Jenkins'
     task :system => :deps do
       ENV['SPEC_FORMAT'] = ''
+      ENV['SPEC_NODE_PATH'] = %w{spec support nodes ci}
       Rake::Task['spec:system'].invoke
     end
   end
