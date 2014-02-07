@@ -25,6 +25,8 @@ gem 'yarjuf', '1.0.4'
 
 # Bundler like utility for Puppet
 # Need pre-release version for 'modulefile' support
+# We also need to include it's 1.8 dependency for it....
+gem 'open3_backport' if RUBY_VERSION < '1.9'
 gem 'librarian-puppet',
   :github => 'rodjek/librarian-puppet',
   :ref    => '772a9b27718aeee2d21521539c90a27a1e08be71'
