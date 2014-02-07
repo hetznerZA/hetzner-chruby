@@ -4,6 +4,8 @@ HOSTS:
     roles:
       - "agent"
       - "master"
+      - "database"
+      - "dashboard"
     hypervisor: "vagrant"
     box: "centos6"
     box_url: "http://puppet-vagrant-boxes.puppetlabs.com/centos-65-i386-virtualbox-puppet.box"
