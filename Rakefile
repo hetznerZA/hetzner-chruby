@@ -8,10 +8,19 @@ task :default => :help
 
 namespace :ci do
 
-  desc 'Run rspec-puppet formatted for Jenkins'
-  task :spec do
-    ENV['SPEC_FORMAT'] = '-r yarjuf -f JUnit -o results_spec.xml -fd'
-    Rake::Task['spec'].invoke
+  namespace :spec do
+
+    desc 'Run rspec-puppet formatted for Jenkins'
+    task :unit do
+      ENV['SPEC_FORMAT'] = '-r yarjuf -f JUnit -o unit_results.xml -fd'
+      Rake::Task['spec:unit'].invoke
+    end
+
+    desc 'Run beaker-rspec formatted for Jenkins'
+    task :system do
+      ENV['SPEC_FORMAT'] = ''
+      Rake::Task['spec:system'].invoke
+    end
   end
 
   desc 'Lint Puppet style with puppet-lint formatted for Jenkins'
@@ -19,6 +28,5 @@ namespace :ci do
     ENV['LINT_FORMAT'] = '%{path}:%{linenumber}:%{check}:%{KIND}:%{message}'
     Rake::Task['lint'].invoke
   end
-
 end
 
