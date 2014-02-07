@@ -5,9 +5,10 @@ task :spec => %w{spec:unit spec:system}
 namespace :spec do
   desc 'Run rspec-puppet'
   task :unit do
-    rspec = 'bundle exec rspec '
+    success      =  false
+    rspec        = 'bundle exec rspec '
     pattern_opts = '-P "spec/unit/**/*_spec.rb" '
-    format_opts  = ENV['SPEC_FORMAT'] || '--color'
+    format_opts  =  ENV['SPEC_FORMAT'] || '--color'
     Dir.chdir ROOT do
       success = system( rspec + pattern_opts + format_opts )
     end
@@ -17,9 +18,10 @@ namespace :spec do
 
   desc 'Run beaker-rspec'
   task :system do
-    rspec = 'bundle exec rspec '
+    success      =  false
+    rspec        = 'bundle exec rspec '
     pattern_opts = '-P "spec/system/**/**_spec.rb" '
-    format_opts  = ENV['SPEC_FORMAT'] || '--color'
+    format_opts  =  ENV['SPEC_FORMAT'] || '--color'
     Dir.chdir ROOT do
       success = system( rspec + pattern_opts + format_opts )
     end
