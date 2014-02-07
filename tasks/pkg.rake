@@ -1,4 +1,16 @@
 
+def compute_dev_version
+  Dir.chdir ROOT do
+    modfile = File.read('Modulefile')
+    version = modfile.match(/\nversion[ ]+['"](.*)['"]/)[1]
+    sha     = `git rev-parse HEAD`[0..7]
+
+    raise "Unknown version type: #{version}" if version.include? '-'
+
+    return "#{version}-dev#{sha}"
+  end
+end
+
 desc 'Package and release a Puppet module to the Forge'
 task :pkg => %w{pkg:build pkg:release} do
 
@@ -12,20 +24,25 @@ end
 
 namespace :pkg do
 
-  desc 'Bump module version to the next minor'
+  desc 'Output what the computed dev version would be'
+  task :version do
+    if STDOUT.tty?
+      puts compute_dev_version
+    else
+      print compute_dev_version
+    end
+  end
+
+  desc 'Bump module version to specified version (default: dev version)'
   task :bump do
     require 'bundler'
     Bundler.setup
 
     Dir.chdir ROOT do
+      version = ENV['PKG_VERSION'] || compute_dev_version
+
       modfile = File.read('Modulefile')
-      version = modfile.match(/\nversion[ ]+['"](.*)['"]/)[1]
-
-      raise "Unknown version type: #{version}" if version.include? '-'
-
-      sha     = `git rev-parse HEAD`[0..7]
-      version = "#{version}-dev#{sha}"
-      modfile.gsub(/\n\s*version[ ]+['"](.*)['"]/, "\nversion '#{version}'")
+      modfile.gsub!(/\n\s*version[ ]+['"](.*)['"]/, "\nversion '#{version}'")
 
       File.open('Modulefile', 'w') {|f| f.puts modfile }
 
