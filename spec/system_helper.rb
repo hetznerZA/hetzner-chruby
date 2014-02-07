@@ -79,7 +79,7 @@ module Beaker
                       merge(env_opts).
                       merge(user_opts)
 
-        key_file  = hunt_for_file(rspec_config.ssh_key, [ENV['HOME'], ['spec', 'support']])
+        key_file  = hunt_for_file(rspec_config.ssh_key, [File.join(ENV['HOME'], '.ssh'), ['spec', 'support']])
         @options[:ssh][:keys] = [File.expand_path(key_file)]   # Grrr...
 
         @logger   = Beaker::Logger.new( options )
