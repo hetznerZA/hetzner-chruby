@@ -29,7 +29,12 @@ namespace :deps do
     Rake::Task['deps:puppet'].invoke
 
     Dir.chdir ROOT do
-      modname = File.basename(ROOT).split('-', 2).pop
+      # grep the Modulefile (because we can assume Jenkins will put the
+      # module in a sanely named directory
+      modname = File.read('Modulefile').match(/\n*\s*name\s+['"](.*)['"]/)[1]
+
+      # split it and pop of the last portion in a '<author>-<modname>' combo
+      modname = modname.split(/[-\/]/, 2).pop
       fixture_path = File.join('modules', modname)
       File.symlink(ROOT, fixture_path) unless File.exists?(fixture_path)
 
