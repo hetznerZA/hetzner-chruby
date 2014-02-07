@@ -36,7 +36,11 @@ module Beaker
               memo[0] ||= []
               memo[0] << dir
               memo[1] ||= []
-              memo[1] << File.join(Dir.pwd, *memo[0])
+              if memo[0][0].start_with?('/')
+                memo[1] << File.join(*memo[0])
+              else
+                memo[1] << File.join(Dir.pwd, *memo[0])
+              end
               memo
             }[1]
           }.flatten
