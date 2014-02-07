@@ -20,6 +20,8 @@ module Beaker
     class TestState
       require 'pathname'
       require 'singleton'
+      require 'beaker/dsl'
+      include Beaker::DSL
 
       include Singleton
 
@@ -67,7 +69,9 @@ module Beaker
                        :log_level  => 'debug',
                        :quiet      => false,
                        :hosts_file => File.basename(node_file),
-                       :provision  => rspec_config.provision
+                       :provision  => rspec_config.provision,
+                       :type       => rspec_config.puppet_type,
+                       :pe_dir     => rspec_config.pe_source
         })
 
         @options  = defaults.
@@ -101,16 +105,32 @@ module Beaker
         network_manager.cleanup
       end
 
-      def default_setup_steps
-        # prepare our env for the test suite
-        hosts = Beaker::RSpec::TestState.instance.hosts
+      def setup_from_forge( forge, version )
         default_host = hosts.find do |host|
           ['default', :default, 'master'].any? do |role|
             host['roles'].include?( role )
           end
         end
-        root = Pathname(rspec_config.default_path).parent.realpath
-        modname = root.basename.to_s.split('-', 2).pop
+        root = Pathname(rspec_config.default_path).parent.realpath.to_s
+        modfile = File.read(File.join(root, 'Modulefile'))
+        modname = modfile.match(/\n*\s*name\s+['"](.*)['"]/)[1]
+        default_host.exec(
+          Beaker::Command.new(
+            "puppet module install #{modname} " +
+            "--version #{version} " +
+            "--module_repository #{forge}"))
+      end
+
+      def setup_from_source
+        # prepare our env for the test suite
+        default_host = hosts.find do |host|
+          ['default', :default, 'master'].any? do |role|
+            host['roles'].include?( role )
+          end
+        end
+        root = Pathname(rspec_config.default_path).parent.realpath.to_s
+        modfile = File.read(File.join(root, 'Modulefile'))
+        modname = modfile.match(/\n*\s*name\s+['"](.*)['"]/)[1].split(/[-\/]/, 2).pop
         mod_on_node = "#{default_host['distmoduledir']}/#{modname}"
         default_host.exec(Beaker::Command.new( "mkdir -p #{mod_on_node}" ))
 
@@ -133,6 +153,27 @@ module Beaker
                "BUNDLE_WITHOUT='ci lint spec pkg' rake deps:ruby; " +
                "LIBRARIAN_PUPPET_PATH=#{default_host['distmoduledir']} rake deps:puppet"))
       end
+
+      def ensure_puppet_enterprise
+        install_pe
+      end
+
+      def default_setup_steps_for( type, forge, version )
+        if type == 'foss'
+          if forge
+            setup_from_forge forge, version
+          else
+            setup_from_source
+          end
+        else
+          ensure_puppet_enterprise
+          if forge
+            setup_from_forge forge, version
+          else
+            setup_from_source
+          end
+        end
+      end
     end
   end
 end
@@ -151,9 +192,13 @@ end
   c.add_setting :validate,       :default => ENV['SPEC_VALIDATE'] == 'true'
   c.add_setting :destroy,        :default => ENV['SPEC_DESTROY'] == 'true'
   c.add_setting :ssh_key,        :default => ENV['SPEC_KEYFILE'] || 'insecure_private_key'
+  c.add_setting :puppet_type,    :default => ENV['SPEC_PUPPET_TYPE'] || 'foss'
+  c.add_setting :module_version, :default => ENV['SPEC_VERSION']
+  c.add_setting :forge,          :default => nil
   c.add_setting :beaker,         :default => Hash.new
   c.add_setting :setup_steps,    :default => nil
   c.add_setting :setup_manifest, :default => ['manifests', 'prerequisites', 'dev.pp']
+  c.add_setting :pe_source,      :default => ENV['SPEC_PE_SOURCE'] || 'http://pe-releases.puppetlabs.net/3.1.2'
 end
 
 # Here we inject Beaker's default stages into our RSpec test run
@@ -172,7 +217,11 @@ end
     end
 
     if ::RSpec.configuration.provision
-      Beaker::RSpec::TestState.instance.default_setup_steps
+      Beaker::RSpec::TestState.
+        instance.
+        default_setup_steps_for(::RSpec.configuration.puppet_type,
+                                ::RSpec.configuration.forge,
+                                ::RSpec.configuration.module_version )
     end
   end
 
