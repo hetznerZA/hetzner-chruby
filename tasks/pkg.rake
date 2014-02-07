@@ -12,6 +12,27 @@ end
 
 namespace :pkg do
 
+  desc 'Bump module version to the next minor'
+  task :bump do
+    require 'bundler'
+    Bundler.setup
+
+    Dir.chdir ROOT do
+      modfile = File.read('Modulefile')
+      version = modfile.match(/\nversion[ ]+['"](.*)['"]/)[1]
+
+      raise "Unknown version type: #{version}" if version.include? '-'
+
+      sha     = `git rev-parse HEAD`[0..7]
+      version = "#{version}-dev#{sha}"
+      modfile.gsub(/\n\s*version[ ]+['"](.*)['"]/, "\nversion '#{version}'")
+
+      File.open('Modulefile', 'w') {|f| f.puts modfile }
+
+      puts "Bumped module to dev version: #{version}"
+    end
+  end
+
   desc 'Build a releaseable Puppet module package'
   task :build => %w{clean:pkg} do
     require 'bundler'
@@ -62,24 +83,6 @@ end
 #  These are tasks from Puppet-Blacksmith whose
 #  value in an actual ci pipeline is suspect
 #
-  desc 'Bump module version to the next minor'
-  task :bump do
-    require 'bundler'
-    Bundler.setup
-
-    Dir.chdir ROOT do
-      modfile = File.read('Modulefile')
-      version = modfile.match(/\nversion[ ]+['"](.*)['"]/)[1]
-
-      raise "Unknown version type: #{version}" if version.include? '-'
-
-      sha     = `git rev-parse HEAD`[0..7]
-      version = "#{version}-dev#{sha}"
-      modfile.gsub(/\n\s*version[ ]+['"](.*)['"]/, "version '#{version}'")
-
-      File.write('Modulefile', 'w') {|f| f.puts modfile }
-    end
-  end
 #
 #  desc 'Git tag with the current module version'
 #  task :tag do
