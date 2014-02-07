@@ -39,12 +39,14 @@ module Beaker
             }[1]
           }.flatten
 
-          possible_search_paths.find do |path|
+          found = possible_search_paths.find do |path|
             File.exists?(File.join(path, basename))
           end
+
+          File.join(found, basename) if found
         end
 
-        return possibilities.flatten.compact.first
+        possibilities.flatten.compact.first
       end
 
       def configure!(rspec_config)
@@ -137,8 +139,14 @@ end
 
 # I hate this, here we set up a prettier way to configure beaker via RSpec
 ::RSpec.configure do |c|
-  c.add_setting :node_set,       :default => ENV['SPEC_NODES'] || 'default.yml'
-  c.add_setting :node_set_path,  :default => ENV['SPEC_NODE_PATH'] || ['spec', 'support', 'nodes', 'vagrant']
+  if ENV['SPEC_NODE_PATH']
+    search_path = ENV['SPEC_NODE_PATH'].split(' ')
+  else
+    search_path = %w{spec support nodes vagrant}
+  end
+
+  c.add_setting :node_set,       :default => ENV['SPEC_NODES'] || 'default'
+  c.add_setting :node_set_path,  :default => search_path
   c.add_setting :provision,      :default => ENV['SPEC_PROVISION'] == 'true'
   c.add_setting :validate,       :default => ENV['SPEC_VALIDATE'] == 'true'
   c.add_setting :destroy,        :default => ENV['SPEC_DESTROY'] == 'true'
