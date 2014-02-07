@@ -5,6 +5,7 @@
 .tmp
 .vagrant
 unit_results.xml
+version.properties
 modules
 pkg
 wiki
