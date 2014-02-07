@@ -194,7 +194,7 @@ end
   c.add_setting :ssh_key,        :default => ENV['SPEC_KEYFILE'] || 'insecure_private_key'
   c.add_setting :puppet_type,    :default => ENV['SPEC_PUPPET_TYPE'] || 'foss'
   c.add_setting :module_version, :default => ENV['SPEC_VERSION']
-  c.add_setting :forge,          :default => nil
+  c.add_setting :forge,          :default => ENV['SPEC_FORGE']
   c.add_setting :beaker,         :default => Hash.new
   c.add_setting :setup_steps,    :default => nil
   c.add_setting :setup_manifest, :default => ['manifests', 'prerequisites', 'dev.pp']
