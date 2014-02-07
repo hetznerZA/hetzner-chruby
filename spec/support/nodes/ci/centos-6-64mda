@@ -1,0 +1,22 @@
+---
+HOSTS:
+  centos-6-x86_64:
+    roles:
+      - master
+      - dashboard
+      - database
+      - agent
+    platform: el-6-x86_64
+    template: Delivery/Quality Assurance/Templates/vCloud/centos-6-x86_64
+    hypervisor: vcloud
+  centos-6-x86_64-agent:
+    roles:
+      - agent
+    platform: el-6-x86_64
+    template: Delivery/Quality Assurance/Templates/vCloud/centos-6-x86_64
+    hypervisor: vcloud
+CONFIG:
+  datastore: instance0
+  folder: Delivery/Quality Assurance/Enterprise/Dynamic
+  resourcepool: delivery/Quality Assurance/Enterprise/Dynamic
+  pooling_api: http://vcloud.delivery.puppetlabs.net/
