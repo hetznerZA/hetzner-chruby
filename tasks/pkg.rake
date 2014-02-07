@@ -64,7 +64,7 @@ namespace :pkg do
           case File.basename(path)
           when *Puppet::ModuleTool::ARTIFACTS
             next
-          when /Gemfile\.lock/, /Puppetfile\.lock/, /^modules/
+          when /Gemfile/, /Puppetfile/, /modules/, /spec/, /tasks/, /Rakefile/
           else
             FileUtils.cp_r path, build_path, :preserve => true
           end
@@ -72,10 +72,12 @@ namespace :pkg do
       end
     end
 
+    printf('%-60s', 'Building module')
     Puppet['confdir'] = '/dev/null'
     module_tool = Puppet::Face['module', :current]
 
     module_tool.build('./')
+    puts '...ok'
   end
 
   desc 'Release built module package to the Forge'
