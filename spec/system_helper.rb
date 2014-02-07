@@ -25,21 +25,22 @@ module Beaker
 
       attr_reader :rspec_config, :options, :logger, :network_manager, :hosts, :node_file
 
-      def hunt_for_file(bare_file, rspec_config)
+      def hunt_for_file(bare_file, search_path)
         yml_file = bare_file + '.yml'
 
         possibilities = [bare_file, yml_file].map do |basename|
-          spec_dir        = Pathname(rspec_config.default_path)
-          in_cwd          = File.expand_path( basename )
-          in_project_root = File.join(spec_dir.parent, basename)
-          in_spec_dir     = File.join(spec_dir, basename)
-          in_support_dir  = File.join(spec_dir, 'support', basename)
-          in_nodes_dir    = File.join(spec_dir, 'support', 'nodes', basename)
+          possible_search_paths = search_path.map {|paths|
+            Array(paths).reduce([[], []]) {|memo, dir|
+              memo[0] ||= []
+              memo[0] << dir
+              memo[1] ||= []
+              memo[1] << File.join(Dir.pwd, *memo[0])
+              memo
+            }[1]
+          }.flatten
 
-          [ in_cwd, in_project_root, in_spec_dir,
-            in_support_dir, in_nodes_dir          ].find do |file|
-
-            File.exists?( file )
+          possible_search_paths.find do |path|
+            File.exists?(File.join(path, basename))
           end
         end
 
@@ -51,7 +52,10 @@ module Beaker
 
         defaults   = Beaker::Options::Presets.presets
         env_opts   = Beaker::Options::Presets.env_vars
-        @node_file = hunt_for_file(rspec_config.node_set, rspec_config)
+        @node_file = hunt_for_file(rspec_config.node_set, [rspec_config.node_set_path])
+
+        raise "Could not find #{rspec_config.node_set}" unless node_file
+
         this_run_dir = File.join('.vagrant', 'beaker_vagrant_files', File.basename(@node_file))
         provisioned = File.exists?(this_run_dir)
         rspec_config.provision = provisioned ? rspec_config.provision : true
@@ -69,7 +73,7 @@ module Beaker
                       merge(env_opts).
                       merge(user_opts)
 
-        key_file  = hunt_for_file(rspec_config.ssh_key, rspec_config)
+        key_file  = hunt_for_file(rspec_config.ssh_key, [ENV['HOME'], ['spec', 'support']])
         @options[:ssh][:keys] = [File.expand_path(key_file)]   # Grrr...
 
         @logger   = Beaker::Logger.new( options )
@@ -134,6 +138,7 @@ end
 # I hate this, here we set up a prettier way to configure beaker via RSpec
 ::RSpec.configure do |c|
   c.add_setting :node_set,       :default => ENV['SPEC_NODES'] || 'default.yml'
+  c.add_setting :node_set_path,  :default => ENV['SPEC_NODE_PATH'] || ['spec', 'support', 'nodes', 'vagrant']
   c.add_setting :provision,      :default => ENV['SPEC_PROVISION'] == 'true'
   c.add_setting :validate,       :default => ENV['SPEC_VALIDATE'] == 'true'
   c.add_setting :destroy,        :default => ENV['SPEC_DESTROY'] == 'true'
