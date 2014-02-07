@@ -9,8 +9,10 @@ namespace :spec do
     pattern_opts = '-P "spec/unit/**/*_spec.rb" '
     format_opts  = ENV['SPEC_FORMAT'] || '--color'
     Dir.chdir ROOT do
-      system( rspec + pattern_opts + format_opts )
+      success = system( rspec + pattern_opts + format_opts )
     end
+
+    exit 1 unless success
   end
 
   desc 'Run beaker-rspec'
@@ -19,8 +21,10 @@ namespace :spec do
     pattern_opts = '-P "spec/system/**/**_spec.rb" '
     format_opts  = ENV['SPEC_FORMAT'] || '--color'
     Dir.chdir ROOT do
-      system( rspec + pattern_opts + format_opts )
+      success = system( rspec + pattern_opts + format_opts )
     end
+
+    exit 1 unless success
   end
 end
 
