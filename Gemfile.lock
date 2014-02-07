@@ -97,12 +97,12 @@ GEM
     rspec-puppet (1.0.1)
       rspec
     ruby-hmac (0.4.0)
-    serverspec (0.15.1)
+    serverspec (0.15.2)
       highline
       net-ssh
       rspec (>= 2.13.0)
-      specinfra (>= 0.5.4)
-    specinfra (0.5.4)
+      specinfra (>= 0.5.6)
+    specinfra (0.5.6)
     thor (0.18.1)
     trollop (2.0)
     unf (0.1.3)
