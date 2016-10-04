@@ -1,8 +1,8 @@
 {
-  "name": "justinstoller/chruby",
+  "name": "hetzner/chruby",
   "version": "0.1.1",
-  "source": "https://github.com/justinstoller/puppet-chruby",
-  "project_page": "https://github.com/justinstoller/puppet-chruby",
+  "source": "https://github.com/hetznerZA/puppet-chruby",
+  "project_page": "https://github.com/hetznerZA/puppet-chruby",
   "author": "justinstoller",
   "license": "Apache-2.0",
   "summary": "Installs chruby",
