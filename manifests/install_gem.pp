@@ -1,3 +1,4 @@
+#This defined type is responsible for installing gems
 define chruby::install_gem(
   $gem          = $title,
   $gem_version  = undef,

@@ -1,3 +1,4 @@
+#Base class to drive chruby gem installation
 class chruby(
   $version       = '0.3.7',
   $ruby_prefix   = '/opt/rubies',
