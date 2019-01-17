@@ -7,7 +7,7 @@ class chruby(
   $group         =  $user,
   $sources_root  =  undef,
   $download_root =  undef
-) {
+){
 
   $sources_dest = $sources_root ? {
     undef   => "${staging_root}/sources",
@@ -34,14 +34,16 @@ class chruby(
   }
 
   # Pull down and install a tool to manage our versions of Ruby
-  staging::deploy { "chruby-v${version}.tar.gz":
-    target  => $sources_dest,
-    source  => "https://github.com/postmodern/chruby/archive/v${version}.tar.gz",
-    user    => $user,
-    group   => $group,
-    creates => "${sources_dest}/chruby-${version}",
-    require => Class['staging'],
-    before  => Exec['install chruby'],
+  archive { "chruby-v${version}.tar.gz":
+    extract      => true,
+    extract_path => $sources_dest,
+    cleanup      => true,
+    source       => "https://github.com/postmodern/chruby/archive/v${version}.tar.gz",
+    user         => $user,
+    group        => $group,
+    creates      => "${sources_dest}/chruby-${version}",
+    require      => Class['staging'],
+    before       => Exec['install chruby'],
   }
 
   exec { 'install chruby':
